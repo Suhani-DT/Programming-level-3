@@ -1,0 +1,184 @@
+"""Mangement of Inventory of music albums."""
+# 10/04/2025
+
+from tkinter import *
+
+
+# Music ALbums
+class Music:
+    """Supporting class for the GUI, that will display albums information."""
+
+    def __init__(self, artist, album_name, start_album):
+        """Have set up key values, as listing them with .self."""
+        self.album_name = album_name
+        self.artist = artist
+        self.start_album = int(start_album)
+
+    def get_info(self):
+        """Display the Artist Albums in order."""
+        return(f"\nAlbum : {self.album_name}\n"
+               f"Artist : {self.artist}\n"
+               f"Number of Albums : {self.start_album}\n"
+               )
+
+
+# Music album setup
+music_album = {
+    "Thriller": Music("Michael Jackson", "Thriller", 15),
+    "Rumours": Music("Fleetwood Mac", "Rumours", 20),
+    "Born To Run": Music("Bruce Springsteen", "Born To Run", 10)
+               }
+
+
+class MusicGUI:
+    """Setup of Album in GUI."""
+
+    def __init__(self, root):
+        """GUI layout."""
+        self.root = root
+        self.root.title("Music Albums - \n Mangement System")
+        self.root.geometry("900x340+100+100")
+        self.root.configure(bg="#ffe6e6")
+        # Entry Labels
+        self.entry_label = Label(root,
+                                 text="Enter input:",
+                                 bg="#ffe6e6",
+                                 font=("Times", "10"))
+        self.entry_label.pack()
+        self.entry_box = Entry(root)
+        self.entry_box.pack()
+
+        # Button frames
+        b_frame = Frame(root)
+        b_frame.pack(pady=20)
+
+        # Button for each function
+        self.b2 = Button(b_frame,
+                         text="Sell Album",
+                         font=("Times", "9"),
+                         bg="#ffb3b3",
+                         width=20,
+                         command=self.sell_album)
+
+        self.b2.grid(pady=5, padx=2, row=0, column=1)
+
+        self.b3 = Button(b_frame,
+                         text="Restock",
+                         font=("Times", "9"),
+                         bg="#ffb3b3",
+                         width=20,
+                         command=self.restock_album)
+
+        self.b3.grid(pady=5, padx=2, row=0, column=2)
+
+        self.b4 = Button(b_frame,
+                         text="Display Stock",
+                         font=("Times", "9"),
+                         bg="#ffb3b3",
+                         width=20,
+                         command=self.show_stock)
+
+        self.b4.grid(pady=5, padx=2, row=0, column=3)
+
+        # Display Box
+        self.output_label = Label(root,
+                                  text="Dive into a collection "
+                                  "of iconic albums!",
+                                  bg="#ffe6e6",
+                                  font=("Times", "10"))
+        self.output_label.pack()
+        self.output_text = Text(root, height=10, width=50)
+        self.output_text.pack()
+
+    def get_entry(self):
+        """User is able to type in the entry box."""
+        return self.entry_box.get().strip()
+
+    def display_output(self, text):
+        """Return the details output for each Albums."""
+        self.output_text.delete("1.0", END)
+        self.output_text.insert(END, text)
+
+    # Main Functions
+    def show_stock(self):
+        """Display all the album."""
+        user_input = self.get_entry().strip().title()
+
+        # Getting the information from dictonary
+        album_name = music_album.get(user_input)
+
+        if album_name:
+            self.display_output(album_name.get_info())
+        else:
+            self.display_output(" Enter your Album Name:")
+
+    def sell_album(self):
+        """Display how many album have been sold."""
+        user_input = self.get_entry().strip().title()
+
+        # Intercating with the users input
+        self.display_output(" Enter Album: Name of the Album \n\n"
+                            " Pss:\n This function reduces"
+                            " the stock one at a time"
+                            "\n when clicked ")
+
+        album_name = music_album.get(user_input, None)
+        print(album_name)
+
+        # Calculation
+        if album_name:
+            if album_name.start_album > 0:
+                album_name.start_album -= 1
+                self.display_output(f" The Updated Stock is : "
+                                    f" {album_name.start_album} "
+                                    f" albums of {user_input}")
+            else:
+                self.display_output(f" Unfortunately, "
+                                    f"We Are Out Of Stock For\n {user_input}")
+
+    def restock_album(self):
+        """Display the amount of albums been restocked."""
+        user_input = self.get_entry().split(',')
+        print(user_input)
+
+        # Error prevention
+        if len(user_input) != 2:
+            self.display_output(" Enter your Album: Name, number of returns")
+            return
+
+        # Getting the information from the user input
+
+        try:
+            name = user_input[0].strip().title()
+            print(name)
+            user_copies = int(user_input[1].strip())
+            print(user_copies)
+
+        except ValueError:
+            self.display_output(" Your first or second value has an error")
+            return
+
+        album_name = music_album.get(name)
+        print(album_name)
+
+        # To check if it updates the dict
+        max_amount = 100
+        total_amount = user_copies + album_name.start_album
+        print(total_amount)
+
+        if total_amount > max_amount:
+            album_name.start_album = max_amount
+            self.display_output(f" {max_amount} Albums is the max amount"
+                                f"\n\nPlease try another number :)")
+
+        else:
+            album_name.start_album = total_amount
+            self.display_output(f" The {name} album: \n"
+                                f" Updated total stock : {total_amount}\n"
+                                f" Max amount of album is: {max_amount}\n")
+
+
+if __name__ == "__main__":
+    root = Tk()
+    app = MusicGUI(root)
+    root.mainloop()
